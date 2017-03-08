@@ -63,6 +63,7 @@ const items = [
     { name: 'products', icon: <ProductIcon /> },
     { name: 'categories', icon: <CategoryIcon /> },
     { name: 'reviews', icon: <ReviewIcon /> },
+    { name: 'zucusers', icon: <LabelIcon /> },
 ];
 
 const prefixedStyles = {};
