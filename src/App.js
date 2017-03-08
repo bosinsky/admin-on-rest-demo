@@ -22,6 +22,8 @@ import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
 
 import restClient from './restClient';
 import fakeRestServer from './restServer';
+import restifyClient from './restifyClient';
+import feathersClient from 'aor-feathers-client';
 
 class App extends Component {
     componentWillMount() {
@@ -36,7 +38,7 @@ class App extends Component {
         return (
             <Admin
                 title="Posters Galore Admin"
-                restClient={restClient}
+                restClient={feathersClient('http://localhost:3004')}
                 customReducers={{ theme: themeReducer }}
                 customSagas={sagas}
                 customRoutes={CustomRoutes}
