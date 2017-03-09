@@ -1,12 +1,15 @@
 import React from 'react';
 import {
+    Create,
     Datagrid,
     Edit,
     EditButton,
+    FormTab,
     List,
     NumberField,
     ReferenceManyField,
     SimpleForm,
+    TabbedForm,
     TextField,
     TextInput,
 } from 'admin-on-rest/lib/mui';
@@ -32,8 +35,18 @@ export const ZucUserList = (props) => (
     </List>
 );
 
-const ZucUserTitle = translate(({ record, translate }) => <span>{translate('resources.zucusers.user', { smart_count: 1 })} "{record.surname} {record.name}"</span>);
+export const ZucUserCreate = (props) => (
+    <Create {...props}>
+        <TabbedForm>
+            <FormTab label="resources.products.tabs.details">
+                <TextInput source="name" validation={{ required: true }} />
+                <TextInput source="surname" validation={{ required: true }} />
+            </FormTab>
+        </TabbedForm>
+    </Create>
+);
 
+const ZucUserTitle = translate(({ record, translate }) => <span>{translate('resources.zucusers.user', { smart_count: 1 })} "{record.surname} {record.name}"</span>);
 export const ZucUserEdit = (props) => (
     <Edit title={<ZucUserTitle />} {...props}>
         <SimpleForm>

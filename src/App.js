@@ -19,7 +19,7 @@ import { CommandList, CommandEdit, CommandIcon } from './commands';
 import { ProductList, ProductCreate, ProductEdit, ProductIcon } from './products';
 import { CategoryList, CategoryEdit, CategoryIcon } from './categories';
 import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
-import { ZucUserList, ZucUserEdit, ZucUserIcon } from './zucusers';
+import { ZucUserList, ZucUserCreate, ZucUserEdit, ZucUserIcon } from './zucusers';
 
 //import restClient from './restClient';
 //import fakeRestServer from './restServer';
@@ -56,7 +56,7 @@ class App extends Component {
                 <Resource name="products" list={ProductList} create={ProductCreate} edit={ProductEdit} remove={Delete} icon={ProductIcon} />
                 <Resource name="categories" list={CategoryList} edit={CategoryEdit} remove={Delete} icon={CategoryIcon} />
                 <Resource name="reviews" list={ReviewList} edit={ReviewEdit} icon={ReviewIcon} />
-                <Resource name="zucusers" list={ZucUserList} edit={ZucUserEdit} remove={Delete} icon={ZucUserIcon} options={{label: 'Orders', endpoint: 'app_users_profile'}} />
+                <Resource name="zucusers" list={ZucUserList} create={ZucUserCreate} edit={ZucUserEdit} remove={Delete} icon={ZucUserIcon} options={{label: 'Orders', endpoint: 'app_users_profile'}} />
             </Admin>
         );
     }

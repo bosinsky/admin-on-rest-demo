@@ -99,7 +99,7 @@ export default (apiUrl, httpClient = fetchJson) => {
                     total: json.length
                 };
             case CREATE:
-                return { ...params.data, id: json.id };
+                return { ...params.data, id: json._id };
             default:
                 return json;
         }
