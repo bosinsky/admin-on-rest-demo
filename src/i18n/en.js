@@ -87,6 +87,11 @@ export default {
                 reviews: 'Reviews',
             },
         },
+        zucusers: {
+            user: 'Utente',
+            surname: 'Cognome |||| Cognomi',
+            name: 'Nome |||| Nomi',
+        },
         categories: {
             name: 'Category |||| Categories',
             fields: {

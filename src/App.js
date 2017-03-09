@@ -19,13 +19,15 @@ import { CommandList, CommandEdit, CommandIcon } from './commands';
 import { ProductList, ProductCreate, ProductEdit, ProductIcon } from './products';
 import { CategoryList, CategoryEdit, CategoryIcon } from './categories';
 import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
+import { ZucUserList, ZucUserEdit, ZucUserIcon } from './zucusers';
 
-import restClient from './restClient';
-import fakeRestServer from './restServer';
+//import restClient from './restClient';
+//import fakeRestServer from './restServer';
 import restifyClient from './restifyClient';
-import feathersClient from 'aor-feathers-client';
+//import feathersClient from 'aor-feathers-client';
 
 class App extends Component {
+    /*
     componentWillMount() {
         this.restoreFetch = fakeRestServer();
     }
@@ -33,12 +35,13 @@ class App extends Component {
     componentWillUnmount() {
         this.restoreFetch();
     }
+    */
 
     render() {
         return (
             <Admin
                 title="Posters Galore Admin"
-                restClient={feathersClient('http://localhost:3004')}
+                restClient={restifyClient('http://localhost:3004')}
                 customReducers={{ theme: themeReducer }}
                 customSagas={sagas}
                 customRoutes={CustomRoutes}
@@ -53,6 +56,7 @@ class App extends Component {
                 <Resource name="products" list={ProductList} create={ProductCreate} edit={ProductEdit} remove={Delete} icon={ProductIcon} />
                 <Resource name="categories" list={CategoryList} edit={CategoryEdit} remove={Delete} icon={CategoryIcon} />
                 <Resource name="reviews" list={ReviewList} edit={ReviewEdit} icon={ReviewIcon} />
+                <Resource name="zucusers" list={ZucUserList} edit={ZucUserEdit} remove={Delete} icon={ZucUserIcon} options={{label: 'Orders', endpoint: 'app_users_profile'}} />
             </Admin>
         );
     }

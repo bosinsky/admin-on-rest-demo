@@ -18,6 +18,7 @@ import { CommandIcon } from './commands';
 import { ProductIcon } from './products';
 import { CategoryIcon } from './categories';
 import { ReviewIcon } from './reviews';
+import { ZucUserIcon } from './zucusers';
 
 const styles = {
     main: {
@@ -63,7 +64,7 @@ const items = [
     { name: 'products', icon: <ProductIcon /> },
     { name: 'categories', icon: <CategoryIcon /> },
     { name: 'reviews', icon: <ReviewIcon /> },
-    { name: 'zucusers', icon: <LabelIcon /> },
+    { name: 'zucusers', icon: <ZucUserIcon /> },
 ];
 
 const prefixedStyles = {};

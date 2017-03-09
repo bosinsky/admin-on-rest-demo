@@ -1,14 +1,12 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _fetch = require('admin-on-rest/lib/util/fetch');
-
-var _types = require('admin-on-rest/lib/rest/types');
+import { queryParameters, fetchJson } from 'admin-on-rest/lib/util/fetch';
+import {
+    GET_LIST,
+    GET_ONE,
+    CREATE,
+    UPDATE,
+    DELETE,
+    fetchUtils,
+} from 'admin-on-rest/lib/rest/types';
 
 /**
  * Maps admin-on-rest queries to a feathers REST API
@@ -20,35 +18,34 @@ var _types = require('admin-on-rest/lib/rest/types');
  * CREATE       => POST http://my.api.url/posts/123
  * DELETE       => DELETE http://my.api.url/posts/123
  */
-exports.default = function (apiUrl) {
-    var httpClient = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _fetch.fetchJson;
 
+const endpoints = {
+    'zucusers': 'app_users_profile'
+};
+
+
+export default (apiUrl, httpClient = fetchJson) => {
     /**
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
      * @param {String} resource Name of the resource to fetch, e.g. 'posts'
      * @param {Object} params The REST request params, depending on the type
      * @returns {Object} { url, options } The HTTP request parameters
      */
-    var convertRESTRequestToHTTP = function convertRESTRequestToHTTP(type, resource, params) {
-        var url = '';
-        var options = {};
-        var query = {};
+    const convertRESTRequestToHTTP = (type, resource, params) => {
+        let url = '';
+        const options = {};
+        let query = {};
+        let endpoint = endpoints.hasOwnProperty(resource) ? endpoints[resource] : resource;
         switch (type) {
-            case _types.GET_LIST:
-            {
-                var _params$pagination = params.pagination,
-                    page = _params$pagination.page,
-                    perPage = _params$pagination.perPage;
-                var _params$sort = params.sort,
-                    field = _params$sort.field,
-                    order = _params$sort.order;
+            case GET_LIST: {
+                const { page, perPage } = params.pagination;
+                const { field, order } = params.sort;
 
-
-                var sortKey = '$sort[' + field + ']';
-                var sortVal = order === 'DESC' ? -1 : 1;
-                if (perPage && page) {
+                let sortKey = '$sort[' + field + ']';
+                let sortVal = (order === 'DESC') ? -1 : 1;
+                if(perPage && page) {
                     query['$limit'] = perPage;
-                    query['$skip'] = perPage * (page - 1);
+                    query['$skip'] = perPage*(page-1);
                 }
                 if (order) {
                     query[sortKey] = JSON.stringify(sortVal);
@@ -56,30 +53,30 @@ exports.default = function (apiUrl) {
 
                 Object.assign(query, params.filter);
 
-                url = apiUrl + '/' + resource + '?' + (0, _fetch.queryParameters)(query);
+                url = `${apiUrl}/${endpoint}?${queryParameters(query)}`;
                 break;
             }
-            case _types.GET_ONE:
-                url = apiUrl + '/' + resource + '/' + params.id;
+            case GET_ONE:
+                url = `${apiUrl}/${endpoint}/${params.id}`;
                 break;
-            case _types.UPDATE:
-                url = apiUrl + '/' + resource + '/' + params.id;
+            case UPDATE:
+                url = `${apiUrl}/${endpoint}/${params.id}`;
                 options.method = 'PUT';
                 options.body = JSON.stringify(params.data);
                 break;
-            case _types.CREATE:
-                url = apiUrl + '/' + resource;
+            case CREATE:
+                url = `${apiUrl}/${endpoint}`;
                 options.method = 'POST';
                 options.body = JSON.stringify(params.data);
                 break;
-            case _types.DELETE:
-                url = apiUrl + '/' + resource + '/' + params.id;
+            case DELETE:
+                url = `${apiUrl}/${endpoint}/${params.id}`;
                 options.method = 'DELETE';
                 break;
             default:
-                throw new Error('Unsupported fetch action type ' + type);
+                throw new Error(`Unsupported fetch action type ${type}`);
         }
-        return { url: url, options: options };
+        return { url, options };
     };
 
     /**
@@ -89,18 +86,20 @@ exports.default = function (apiUrl) {
      * @param {Object} params The REST request params, depending on the type
      * @returns {Object} REST response
      */
-    var convertHTTPResponseToREST = function convertHTTPResponseToREST(response, type, resource, params) {
-        var headers = response.headers,
-            json = response.json;
-
+    const convertHTTPResponseToREST = (response, type, resource, params) => {
+        const { headers, json } = response;
         switch (type) {
-            case _types.GET_LIST:
+            case GET_LIST:
+                let data = json.map((item) => {
+                    item['id'] = item._id
+                    return item;
+                })
                 return {
-                    data: json.data,
-                    total: json.total
+                    data: data,
+                    total: json.length
                 };
-            case _types.CREATE:
-                return _extends({}, params.data, { id: json.id });
+            case CREATE:
+                return { ...params.data, id: json.id };
             default:
                 return json;
         }
@@ -112,15 +111,11 @@ exports.default = function (apiUrl) {
      * @param {Object} payload Request parameters. Depends on the request type
      * @returns {Promise} the Promise for a REST response
      */
-    return function (type, resource, params) {
-        var _convertRESTRequestTo = convertRESTRequestToHTTP(type, resource, params),
-            url = _convertRESTRequestTo.url,
-            options = _convertRESTRequestTo.options;
-
-        return httpClient(url, options).then(function (response) {
-            return convertHTTPResponseToREST(response, type, resource, params);
-        });
+    return (type, resource, params) => {
+        const { url, options } = convertRESTRequestToHTTP(type, resource, params);
+        return httpClient(url, options)
+            .then(response =>
+                convertHTTPResponseToREST(response, type, resource, params)
+            );
     };
 };
-
-module.exports = exports['default'];
