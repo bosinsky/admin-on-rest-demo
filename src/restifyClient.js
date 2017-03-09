@@ -108,6 +108,18 @@ export default (apiUrl, httpClient = fetchJson) => {
         }
     };
 
+
+    const fetchResourceCount = (type, resource) => {
+        switch (type) {
+            case GET_LIST:
+                let endpoint = endpoints.hasOwnProperty(resource) ? endpoints[resource] : resource;
+                let url = `${apiUrl}/${endpoint}/count`;
+                return httpClient(url, []);
+            default:
+                return Promise.resolve();
+        }
+    };
+
     /**
      * @param {string} type Request type, e.g GET_LIST
      * @param {string} resource Resource name, e.g. "posts"
@@ -116,7 +128,8 @@ export default (apiUrl, httpClient = fetchJson) => {
      */
     return (type, resource, params) => {
         const { url, options } = convertRESTRequestToHTTP(type, resource, params);
-        return httpClient(url, options)
+        return fetchResourceCount(type, resource)
+            .then(total => httpClient(url, options))
             .then(response =>
                 convertHTTPResponseToREST(response, type, resource, params)
             );
