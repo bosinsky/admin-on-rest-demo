@@ -41,14 +41,15 @@ export default (apiUrl, httpClient = fetchJson) => {
                 const { page, perPage } = params.pagination;
                 const { field, order } = params.sort;
 
-                let sortKey = '$sort[' + field + ']';
-                let sortVal = (order === 'DESC') ? -1 : 1;
-                if(perPage && page) {
-                    query['$limit'] = perPage;
-                    query['$skip'] = perPage*(page-1);
+                if (field) {
+                    let sort = {};
+                    sort[field] = order === 'DESC' ? -1 : 1;
+                    query['sort'] = JSON.stringify(sort);
                 }
-                if (order) {
-                    query[sortKey] = JSON.stringify(sortVal);
+
+                if(perPage && page) {
+                    query['limit'] = perPage;
+                    query['skip'] = perPage * (page-1);
                 }
 
                 Object.assign(query, params.filter);
@@ -94,9 +95,11 @@ export default (apiUrl, httpClient = fetchJson) => {
                     item['id'] = item._id
                     return item;
                 })
+                //FIXME get total record count from rest
+                //http://localhost/api/v1/${resource}/count
                 return {
                     data: data,
-                    total: json.length
+                    total: 11
                 };
             case CREATE:
                 return { ...params.data, id: json._id };
