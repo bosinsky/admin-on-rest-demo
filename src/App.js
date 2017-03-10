@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import React, { Component } from 'react';
 import { Admin, Resource } from 'admin-on-rest';
 import { Delete } from 'admin-on-rest/lib/mui';
+import ermClient from 'aor-erm-client';
 
 import './App.css';
 
@@ -21,14 +22,13 @@ import { CategoryList, CategoryEdit, CategoryIcon } from './categories';
 import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
 import { ZucUserList, ZucUserCreate, ZucUserEdit, ZucUserIcon } from './zucusers';
 
-import restifyClient from './restifyClient';
 
 class App extends Component {
     render() {
         return (
             <Admin
                 title="Posters Galore Admin"
-                restClient={restifyClient('http://localhost:3004')}
+                restClient={ermClient('http://localhost:3004')}
                 customReducers={{ theme: themeReducer }}
                 customSagas={sagas}
                 customRoutes={CustomRoutes}
