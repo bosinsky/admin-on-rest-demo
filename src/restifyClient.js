@@ -95,28 +95,15 @@ export default (apiUrl, httpClient = fetchJson) => {
                     item['id'] = item._id
                     return item;
                 })
-                //FIXME get total record count from rest
-                //http://localhost/api/v1/${resource}/count
                 return {
                     data: data,
-                    total: 11
+                    total: 0
                 };
             case CREATE:
-                return { ...params.data, id: json._id };
+                json.id = json._id;
+                return json;
             default:
                 return json;
-        }
-    };
-
-
-    const fetchResourceCount = (type, resource) => {
-        switch (type) {
-            case GET_LIST:
-                let endpoint = endpoints.hasOwnProperty(resource) ? endpoints[resource] : resource;
-                let url = `${apiUrl}/${endpoint}/count`;
-                return httpClient(url, []);
-            default:
-                return Promise.resolve();
         }
     };
 
@@ -128,42 +115,22 @@ export default (apiUrl, httpClient = fetchJson) => {
      */
     return (type, resource, params) => {
         const { url, options } = convertRESTRequestToHTTP(type, resource, params);
-
-/*
-        return fetchResourceCount(type, resource)
-            .then(total => httpClient(url, options))
-*/
-
         let httpResponseToRest = httpClient(url, options)
-            .then(response =>
-                convertHTTPResponseToREST(response, type, resource, params)
-            );
+            .then(response => convertHTTPResponseToREST(response, type, resource, params));
 
-        if (type !== GET_LIST) {
-            return httpResponseToRest;
+        let total = null;
+        if (type === GET_LIST) {
+            let endpoint = endpoints.hasOwnProperty(resource) ? endpoints[resource] : resource;
+            let countUrl = `${apiUrl}/${endpoint}/count`;
+            total = httpClient(countUrl, []);
         }
-
-let httpResponseData = Promise.resolve(httpResponseToRest);
-        let endpoint = endpoints.hasOwnProperty(resource) ? endpoints[resource] : resource;
-        let countUrl = `${apiUrl}/${endpoint}/count`;
-
-
-        return httpResponseToRest
-                .then(() => {
-                    return httpClient(countUrl, []);
-                })
-                .then(response => {
-                    let total = response.status === 200 ? JSON.parse(response.body).count : 0;
-                    return Object.assign({}, httpResponseToRest.value(), {total: total});
-                });
-
-        return httpResponseData.
-            then((data) => {
-                httpClient(countUrl, []);
-            })
-            .then(response => {
-                httpResponseToRest['total'] = response.status === 200 ? JSON.parse(response.body).count : 0;
-                return httpResponseToRest;
-            });
+        return Promise.all([httpResponseToRest, total]).then((values) => {
+            let data = values[0];
+            if (total) {
+                data['total'] = values[1].json.count;
+            }
+            return data;
+        });
     };
 };
+

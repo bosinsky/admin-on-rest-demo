@@ -21,22 +21,9 @@ import { CategoryList, CategoryEdit, CategoryIcon } from './categories';
 import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
 import { ZucUserList, ZucUserCreate, ZucUserEdit, ZucUserIcon } from './zucusers';
 
-//import restClient from './restClient';
-//import fakeRestServer from './restServer';
 import restifyClient from './restifyClient';
-//import feathersClient from 'aor-feathers-client';
 
 class App extends Component {
-    /*
-    componentWillMount() {
-        this.restoreFetch = fakeRestServer();
-    }
-
-    componentWillUnmount() {
-        this.restoreFetch();
-    }
-    */
-
     render() {
         return (
             <Admin
